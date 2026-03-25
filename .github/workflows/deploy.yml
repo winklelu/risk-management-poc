@@ -1,0 +1,60 @@
+name: Deploy Shinylive to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pipeline dependencies
+        run: pip install pandas numpy pyyaml
+
+      - name: Generate SDTM data & risk_summary.csv
+        run: |
+          cd Risk_Management/python
+          python pipeline.py
+
+      - name: Sync generated data into shiny bundle
+        run: |
+          cp Risk_Management/data/risk_summary.csv Risk_Management/shiny/data/
+          cp Risk_Management/config/indicators.yaml Risk_Management/shiny/config/
+
+      - name: Install Shinylive
+        run: pip install shinylive shiny plotly pyyaml pandas numpy
+
+      - name: Export Shinylive static site
+        run: |
+          shinylive export Risk_Management/shiny site
+
+      - name: Add .nojekyll (required for GitHub Pages)
+        run: touch site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

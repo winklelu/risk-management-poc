@@ -1,0 +1,508 @@
+---
+title: "Clinical Trial Risk Management Report"
+subtitle: "Study STUDY001 — Risk Indicator Summary"
+author: "Risk Management Team"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    code-fold: true
+    code-summary: "Show Code"
+    embed-resources: true
+    page-layout: full
+    css: report_styles.css
+params:
+  snapshot_date: "2026-03-25"
+  data_dir: "../data"
+  config_dir: "../config"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| include: false
+
+import os
+import sys
+import yaml
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+from IPython.display import display, HTML
+from datetime import datetime
+
+# Resolve paths relative to this .qmd file
+QMD_DIR = os.path.abspath(".")
+DATA_DIR = os.path.join(QMD_DIR, "..", "data")
+CONFIG_DIR = os.path.join(QMD_DIR, "..", "config")
+
+# ── Load data ──────────────────────────────────────────────────────────────
+risk_summary = pd.read_csv(os.path.join(DATA_DIR, "risk_summary.csv"))
+
+with open(os.path.join(CONFIG_DIR, "indicators.yaml"), "r") as f:
+    config = yaml.safe_load(f)
+
+# ── Constants ──────────────────────────────────────────────────────────────
+STATUS_COLORS = {
+    "Green": "#2ecc71",
+    "Yellow": "#f39c12",
+    "Red":    "#e74c3c",
+}
+
+SNAPSHOT_DATE = params["snapshot_date"]
+
+qtl_df = risk_summary[risk_summary["indicator_type"] == "QTL"].copy()
+kri_df = risk_summary[risk_summary["indicator_type"] == "KRI"].copy()
+
+# ── Indicator metadata ─────────────────────────────────────────────────────
+ind_meta = {}
+for group in ("qtl", "kri"):
+    for item in config.get(group, []):
+        ind_meta[item["id"]] = item
+
+# ── Helper: status badge HTML ──────────────────────────────────────────────
+def status_badge(status: str) -> str:
+    colors = {"Green": "#2ecc71", "Yellow": "#f39c12", "Red": "#e74c3c"}
+    c = colors.get(status, "#aaa")
+    return f'<span style="background:{c};color:#fff;padding:2px 8px;border-radius:4px;font-size:0.8rem;font-weight:600;">{status}</span>'
+
+def fmt_table(df: pd.DataFrame) -> str:
+    """Render a DataFrame as a styled HTML table."""
+    return df.to_html(
+        escape=False,
+        index=False,
+        classes="table table-striped table-hover table-sm",
+        border=0,
+    )
+```
+
+## Executive Summary
+
+```{python}
+#| label: exec-summary
+#| echo: false
+
+total_sites = risk_summary["SITEID"].nunique()
+total_indicators = risk_summary["indicator_id"].nunique()
+
+sites_red    = risk_summary[risk_summary["status"] == "Red"]["SITEID"].nunique()
+sites_yellow_only = risk_summary.groupby("SITEID").apply(
+    lambda g: (g["status"] == "Yellow").any() and not (g["status"] == "Red").any()
+).sum()
+sites_green_only = total_sites - sites_red - sites_yellow_only
+
+total_red_flags    = (risk_summary["status"] == "Red").sum()
+total_yellow_flags = (risk_summary["status"] == "Yellow").sum()
+
+# Worst sites
+worst = (
+    risk_summary.groupby("SITEID")
+    .apply(lambda g: pd.Series({
+        "n_red":    (g["status"] == "Red").sum(),
+        "n_yellow": (g["status"] == "Yellow").sum(),
+    }))
+    .reset_index()
+    .sort_values(["n_red", "n_yellow"], ascending=False)
+)
+
+worst_site = worst.iloc[0]["SITEID"] if len(worst) > 0 else "N/A"
+worst_n_red = int(worst.iloc[0]["n_red"]) if len(worst) > 0 else 0
+
+summary_html = f"""
+<div style="background:#f8f9fa;border-left:4px solid #e74c3c;padding:16px 20px;
+            border-radius:4px;margin:16px 0;line-height:1.8;">
+  <p>As of <strong>{SNAPSHOT_DATE}</strong>, the risk management dashboard covers
+  <strong>{total_sites} sites</strong> and <strong>{total_indicators} quality indicators</strong>
+  (QTL and KRI) for Study STUDY001.</p>
+
+  <ul>
+    <li><strong style="color:#e74c3c;">{sites_red} site(s)</strong> have at least one
+    <strong>Red alert</strong> requiring immediate action
+    ({total_red_flags} red flag(s) in total).</li>
+
+    <li><strong style="color:#f39c12;">{int(sites_yellow_only)} site(s)</strong> show
+    <strong>Yellow alert</strong> status and require close monitoring
+    ({total_yellow_flags} yellow flag(s) in total).</li>
+
+    <li><strong style="color:#2ecc71;">{int(sites_green_only)} site(s)</strong> are within
+    acceptable limits across all indicators.</li>
+  </ul>
+
+  <p>Site <strong>{worst_site}</strong> presents the highest risk profile with
+  <strong>{worst_n_red} red alert indicator(s)</strong> and should be prioritised for
+  site management intervention.</p>
+</div>
+"""
+
+display(HTML(summary_html))
+```
+
+```{python}
+#| label: kpi-cards
+#| echo: false
+
+cards_html = f"""
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;">
+
+  <div style="flex:1;min-width:140px;background:#fff;border-top:4px solid #3498db;
+              border-radius:8px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+    <div style="font-size:2rem;font-weight:700;color:#3498db;">{total_sites}</div>
+    <div style="color:#7f8c8d;font-size:0.85rem;margin-top:4px;">Total Sites</div>
+  </div>
+
+  <div style="flex:1;min-width:140px;background:#fff;border-top:4px solid #e74c3c;
+              border-radius:8px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+    <div style="font-size:2rem;font-weight:700;color:#e74c3c;">{sites_red}</div>
+    <div style="color:#7f8c8d;font-size:0.85rem;margin-top:4px;">Red Alert Sites</div>
+  </div>
+
+  <div style="flex:1;min-width:140px;background:#fff;border-top:4px solid #f39c12;
+              border-radius:8px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+    <div style="font-size:2rem;font-weight:700;color:#f39c12;">{int(sites_yellow_only)}</div>
+    <div style="color:#7f8c8d;font-size:0.85rem;margin-top:4px;">Yellow-Only Sites</div>
+  </div>
+
+  <div style="flex:1;min-width:140px;background:#fff;border-top:4px solid #2ecc71;
+              border-radius:8px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+    <div style="font-size:2rem;font-weight:700;color:#2ecc71;">{int(sites_green_only)}</div>
+    <div style="color:#7f8c8d;font-size:0.85rem;margin-top:4px;">Green Sites</div>
+  </div>
+
+  <div style="flex:1;min-width:140px;background:#fff;border-top:4px solid #9b59b6;
+              border-radius:8px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+    <div style="font-size:2rem;font-weight:700;color:#9b59b6;">{total_indicators}</div>
+    <div style="color:#7f8c8d;font-size:0.85rem;margin-top:4px;">Indicators</div>
+  </div>
+
+</div>
+"""
+display(HTML(cards_html))
+```
+
+---
+
+## QTL Overview
+
+Quality Tolerance Limits (QTLs) monitor key quality metrics that, if breached, may
+indicate systemic data quality or compliance issues.
+
+### QTL Summary Table
+
+```{python}
+#| label: qtl-table
+
+qtl_display = qtl_df[[
+    "SITEID", "indicator_id", "indicator_name", "category",
+    "value", "threshold_yellow", "threshold_red", "status",
+    "n_numerator", "n_denominator",
+]].copy()
+
+qtl_display["status_badge"] = qtl_display["status"].apply(status_badge)
+qtl_display["value"] = qtl_display["value"].map("{:.2f}%".format)
+
+qtl_display = qtl_display.rename(columns={
+    "SITEID": "Site",
+    "indicator_id": "ID",
+    "indicator_name": "Indicator",
+    "category": "Category",
+    "value": "Value",
+    "threshold_yellow": "Yellow (%)",
+    "threshold_red": "Red (%)",
+    "status_badge": "Status",
+    "n_numerator": "Numerator",
+    "n_denominator": "Denominator",
+}).drop(columns=["status"])
+
+display(HTML(fmt_table(qtl_display)))
+```
+
+### QTL Bar Charts
+
+```{python}
+#| label: qtl-bar-charts
+
+for ind_id in sorted(qtl_df["indicator_id"].unique()):
+    df_ind = qtl_df[qtl_df["indicator_id"] == ind_id].sort_values("SITEID")
+    if df_ind.empty:
+        continue
+
+    meta = ind_meta.get(ind_id, {})
+    yellow_t = df_ind["threshold_yellow"].iloc[0]
+    red_t     = df_ind["threshold_red"].iloc[0]
+    bar_colors = [STATUS_COLORS.get(s, "#aaa") for s in df_ind["status"]]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_ind["SITEID"],
+        y=df_ind["value"],
+        marker_color=bar_colors,
+        text=[f"{v:.1f}%" for v in df_ind["value"]],
+        textposition="outside",
+        hovertemplate="<b>%{x}</b><br>Value: %{y:.1f}%<extra></extra>",
+    ))
+    fig.add_hline(y=yellow_t, line_dash="dash", line_color="#f39c12",
+                  annotation_text=f"Yellow ({yellow_t}%)",
+                  annotation_font_color="#f39c12")
+    fig.add_hline(y=red_t, line_dash="dash", line_color="#e74c3c",
+                  annotation_text=f"Red ({red_t}%)",
+                  annotation_font_color="#e74c3c")
+    fig.update_layout(
+        title=f"{ind_id}: {meta.get('name', '')}",
+        xaxis_title="Site",
+        yaxis_title="Value (%)",
+        height=350,
+        margin=dict(l=60, r=80, t=60, b=60),
+        showlegend=False,
+        template="plotly_white",
+    )
+    fig.show()
+```
+
+---
+
+## KRI Overview
+
+Key Risk Indicators (KRIs) are proactive signals of emerging risks that may affect
+study quality, patient safety, or data integrity.
+
+### KRI Summary Table
+
+```{python}
+#| label: kri-table
+
+kri_display = kri_df[[
+    "SITEID", "indicator_id", "indicator_name", "category",
+    "value", "threshold_yellow", "threshold_red", "status",
+    "n_numerator", "n_denominator",
+]].copy()
+
+kri_display["status_badge"] = kri_display["status"].apply(status_badge)
+kri_display["value"] = kri_display["value"].map("{:.2f}%".format)
+
+kri_display = kri_display.rename(columns={
+    "SITEID": "Site",
+    "indicator_id": "ID",
+    "indicator_name": "Indicator",
+    "category": "Category",
+    "value": "Value",
+    "threshold_yellow": "Yellow (%)",
+    "threshold_red": "Red (%)",
+    "status_badge": "Status",
+    "n_numerator": "Numerator",
+    "n_denominator": "Denominator",
+}).drop(columns=["status"])
+
+display(HTML(fmt_table(kri_display)))
+```
+
+### KRI Bar Charts
+
+```{python}
+#| label: kri-bar-charts
+
+for ind_id in sorted(kri_df["indicator_id"].unique()):
+    df_ind = kri_df[kri_df["indicator_id"] == ind_id].sort_values("SITEID")
+    if df_ind.empty:
+        continue
+
+    meta = ind_meta.get(ind_id, {})
+    yellow_t = df_ind["threshold_yellow"].iloc[0]
+    red_t     = df_ind["threshold_red"].iloc[0]
+    bar_colors = [STATUS_COLORS.get(s, "#aaa") for s in df_ind["status"]]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_ind["SITEID"],
+        y=df_ind["value"],
+        marker_color=bar_colors,
+        text=[f"{v:.1f}%" for v in df_ind["value"]],
+        textposition="outside",
+        hovertemplate="<b>%{x}</b><br>Value: %{y:.1f}%<extra></extra>",
+    ))
+    fig.add_hline(y=yellow_t, line_dash="dash", line_color="#f39c12",
+                  annotation_text=f"Yellow ({yellow_t}%)",
+                  annotation_font_color="#f39c12")
+    fig.add_hline(y=red_t, line_dash="dash", line_color="#e74c3c",
+                  annotation_text=f"Red ({red_t}%)",
+                  annotation_font_color="#e74c3c")
+    fig.update_layout(
+        title=f"{ind_id}: {meta.get('name', '')}",
+        xaxis_title="Site",
+        yaxis_title="Value (%)",
+        height=350,
+        margin=dict(l=60, r=80, t=60, b=60),
+        showlegend=False,
+        template="plotly_white",
+    )
+    fig.show()
+```
+
+---
+
+## Site Risk Profile
+
+### Risk Heatmap
+
+The heatmap below summarises the traffic-light status of every indicator for each site.
+Red cells indicate a threshold breach requiring immediate action; yellow cells require
+enhanced monitoring.
+
+```{python}
+#| label: heatmap
+#| fig-height: 5
+
+STATUS_NUMERIC = {"Green": 0, "Yellow": 1, "Red": 2}
+
+pivot = risk_summary.pivot_table(
+    index="indicator_id", columns="SITEID", values="status", aggfunc="first"
+).fillna("Green")
+
+indicators = sorted(pivot.index.tolist())
+sites       = sorted(pivot.columns.tolist())
+
+z_num  = pivot.loc[indicators, sites].applymap(lambda s: STATUS_NUMERIC.get(s, 0)).values
+z_text = pivot.loc[indicators, sites].values
+
+colorscale = [
+    [0.0, "#2ecc71"],
+    [0.5, "#f39c12"],
+    [1.0, "#e74c3c"],
+]
+
+# Build hover text with values
+hover = []
+for ind in indicators:
+    row_hover = []
+    for site in sites:
+        row_data = risk_summary[(risk_summary["indicator_id"] == ind) & (risk_summary["SITEID"] == site)]
+        if not row_data.empty:
+            v = row_data["value"].iloc[0]
+            s = row_data["status"].iloc[0]
+            row_hover.append(f"Site: {site}<br>Indicator: {ind}<br>Value: {v:.1f}%<br>Status: {s}")
+        else:
+            row_hover.append(f"Site: {site}<br>Indicator: {ind}<br>No data")
+    hover.append(row_hover)
+
+fig = go.Figure(go.Heatmap(
+    z=z_num,
+    x=sites,
+    y=indicators,
+    text=z_text,
+    texttemplate="%{text}",
+    colorscale=colorscale,
+    zmin=0,
+    zmax=2,
+    showscale=False,
+    hovertext=hover,
+    hoverinfo="text",
+    xgap=3,
+    ygap=3,
+))
+
+fig.update_layout(
+    title="Site × Indicator Risk Heatmap",
+    xaxis=dict(title="Site", side="bottom"),
+    yaxis=dict(title="Indicator", autorange="reversed"),
+    height=420,
+    margin=dict(l=120, r=20, t=60, b=60),
+    template="plotly_white",
+)
+
+fig.show()
+```
+
+### Site Risk Score Table
+
+```{python}
+#| label: site-risk-score
+#| echo: false
+
+site_risk = risk_summary.groupby("SITEID").agg(
+    Red    = ("status", lambda x: (x == "Red").sum()),
+    Yellow = ("status", lambda x: (x == "Yellow").sum()),
+    Green  = ("status", lambda x: (x == "Green").sum()),
+).reset_index()
+
+site_risk["Overall Risk"] = site_risk.apply(
+    lambda r: status_badge("Red") if r["Red"] > 0
+              else (status_badge("Yellow") if r["Yellow"] > 0
+                    else status_badge("Green")),
+    axis=1,
+)
+
+site_risk = site_risk.rename(columns={
+    "SITEID": "Site",
+    "Red": "# Red Flags",
+    "Yellow": "# Yellow Flags",
+    "Green": "# Green",
+})
+
+display(HTML(fmt_table(site_risk)))
+```
+
+---
+
+## Appendix: Indicator Definitions
+
+```{python}
+#| label: appendix
+#| echo: false
+
+rows_html = ""
+for group_label, group_key in [("QTL — Quality Tolerance Limits", "qtl"),
+                                 ("KRI — Key Risk Indicators", "kri")]:
+    rows_html += f"""
+    <tr>
+      <td colspan="7" style="background:#e8f4fd;font-weight:700;color:#2980b9;
+                              padding:10px 12px;font-size:0.95rem;">
+        {group_label}
+      </td>
+    </tr>
+    """
+    for item in config.get(group_key, []):
+        direction = item.get("direction", "higher_is_worse")
+        dir_label = "Lower is worse" if direction == "lower_is_worse" else "Higher is worse"
+        rows_html += f"""
+        <tr>
+          <td><strong>{item['id']}</strong></td>
+          <td>{item['name']}</td>
+          <td>{item.get('category', '')}</td>
+          <td style="font-size:0.82rem;color:#555;">{item.get('description', '')}</td>
+          <td style="color:#f39c12;font-weight:600;">{item.get('threshold_yellow', '')}%</td>
+          <td style="color:#e74c3c;font-weight:600;">{item.get('threshold_red', '')}%</td>
+          <td style="font-size:0.82rem;">{dir_label}</td>
+        </tr>
+        """
+
+table_html = f"""
+<table class="table table-bordered table-sm" style="font-size:0.88rem;">
+  <thead style="background:#2c3e50;color:#fff;">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Description</th>
+      <th>Yellow Threshold</th>
+      <th>Red Threshold</th>
+      <th>Direction</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>
+"""
+
+display(HTML(table_html))
+```
+
+---
+
+*Report generated on `{python} SNAPSHOT_DATE` · Study STUDY001 · Risk Management Team*

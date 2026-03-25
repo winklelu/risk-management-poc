@@ -1,0 +1,225 @@
+/* ── Clinical Trial Risk Management Dashboard Styles ── */
+
+/* Global reset & base */
+body {
+    background-color: #16213e !important;
+    color: #ecf0f1 !important;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Navbar */
+.navbar,
+.navbar-default {
+    background-color: #141b2d !important;
+    border-bottom: 2px solid #3498db !important;
+    box-shadow: 0 2px 12px rgba(52, 152, 219, 0.15);
+}
+
+/* Nav tabs */
+.nav-tabs {
+    background-color: #1e2535 !important;
+    border-bottom: 1px solid #2c3e50 !important;
+    padding: 0 16px;
+}
+
+.nav-tabs .nav-link {
+    color: #bdc3c7 !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    padding: 12px 20px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #ecf0f1 !important;
+    border-bottom-color: #3498db !important;
+    background: transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: #3498db !important;
+    border-bottom: 3px solid #3498db !important;
+    background: transparent !important;
+    font-weight: 600;
+}
+
+/* Sidebar */
+.bslib-sidebar-layout > .sidebar {
+    background-color: #1e2535 !important;
+    border-right: 1px solid #2c3e50 !important;
+    padding: 20px 16px !important;
+}
+
+/* Form controls */
+.form-control,
+.form-select,
+.selectize-input {
+    background-color: #252e3f !important;
+    border: 1px solid #3a4456 !important;
+    color: #ecf0f1 !important;
+    border-radius: 6px !important;
+}
+
+.form-control:focus,
+.selectize-input.focus {
+    border-color: #3498db !important;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2) !important;
+}
+
+.selectize-dropdown {
+    background-color: #252e3f !important;
+    border: 1px solid #3a4456 !important;
+    color: #ecf0f1 !important;
+}
+
+.selectize-dropdown .option:hover,
+.selectize-dropdown .option.active {
+    background-color: #3498db !important;
+    color: #fff !important;
+}
+
+label {
+    color: #bdc3c7 !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+/* DataGrid / tables */
+.shiny-data-grid,
+.shiny-data-grid table {
+    background-color: #1e2535 !important;
+    color: #ecf0f1 !important;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.shiny-data-grid thead th {
+    background-color: #252e3f !important;
+    color: #3498db !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #3498db !important;
+    padding: 10px 12px;
+}
+
+.shiny-data-grid tbody tr {
+    border-bottom: 1px solid #2c3e50 !important;
+    transition: background 0.15s ease;
+}
+
+.shiny-data-grid tbody tr:hover {
+    background-color: #252e3f !important;
+}
+
+.shiny-data-grid tbody td {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+/* Plotly charts */
+.js-plotly-plot {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Card stat boxes */
+.stat-card {
+    background: #252e3f;
+    border-radius: 8px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 130px;
+    flex: 1;
+}
+
+/* Alert status badges */
+.status-red {
+    display: inline-block;
+    background: #e74c3c;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-yellow {
+    display: inline-block;
+    background: #f39c12;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-green {
+    display: inline-block;
+    background: #2ecc71;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e2535;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a4456;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3498db;
+}
+
+/* Section headers */
+h5, h6 {
+    color: #ecf0f1 !important;
+}
+
+/* Tooltip */
+.tooltip-inner {
+    background-color: #252e3f !important;
+    border: 1px solid #3498db !important;
+    color: #ecf0f1 !important;
+    max-width: 300px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    text-align: left;
+}
+
+/* Indicator info panel */
+.indicator-info {
+    background: #1a2233;
+    border-left: 4px solid #3498db;
+    padding: 16px;
+    border-radius: 4px;
+    color: #ecf0f1;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}
+
+.indicator-info strong {
+    color: #3498db;
+}
+
+code {
+    background: #252e3f;
+    color: #e74c3c;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.85rem;
+}

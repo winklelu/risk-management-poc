@@ -1,0 +1,57 @@
+SITEID,indicator_id,indicator_name,category,value,threshold_yellow,threshold_red,status,n_numerator,n_denominator,indicator_type,snapshot_date
+SITE001,QTL01,Protocol Deviation Rate,Compliance,4.0,5.0,10.0,Green,1,25,QTL,2026-03-25
+SITE001,QTL02,Early Discontinuation Rate,Retention,0.0,15.0,25.0,Green,0,25,QTL,2026-03-25
+SITE001,QTL03,Missing Primary Endpoint Rate,Data Quality,4.0,5.0,10.0,Green,1,25,QTL,2026-03-25
+SITE002,QTL01,Protocol Deviation Rate,Compliance,4.55,5.0,10.0,Green,1,22,QTL,2026-03-25
+SITE002,QTL02,Early Discontinuation Rate,Retention,9.09,15.0,25.0,Green,2,22,QTL,2026-03-25
+SITE002,QTL03,Missing Primary Endpoint Rate,Data Quality,9.09,5.0,10.0,Yellow,2,22,QTL,2026-03-25
+SITE003,QTL01,Protocol Deviation Rate,Compliance,7.41,5.0,10.0,Yellow,2,27,QTL,2026-03-25
+SITE003,QTL02,Early Discontinuation Rate,Retention,11.11,15.0,25.0,Green,3,27,QTL,2026-03-25
+SITE003,QTL03,Missing Primary Endpoint Rate,Data Quality,3.7,5.0,10.0,Green,1,27,QTL,2026-03-25
+SITE004,QTL01,Protocol Deviation Rate,Compliance,15.0,5.0,10.0,Red,3,20,QTL,2026-03-25
+SITE004,QTL02,Early Discontinuation Rate,Retention,10.0,15.0,25.0,Green,2,20,QTL,2026-03-25
+SITE004,QTL03,Missing Primary Endpoint Rate,Data Quality,5.0,5.0,10.0,Green,1,20,QTL,2026-03-25
+SITE005,QTL01,Protocol Deviation Rate,Compliance,0.0,5.0,10.0,Green,0,30,QTL,2026-03-25
+SITE005,QTL02,Early Discontinuation Rate,Retention,6.67,15.0,25.0,Green,2,30,QTL,2026-03-25
+SITE005,QTL03,Missing Primary Endpoint Rate,Data Quality,0.0,5.0,10.0,Green,0,30,QTL,2026-03-25
+SITE006,QTL01,Protocol Deviation Rate,Compliance,0.0,5.0,10.0,Green,0,24,QTL,2026-03-25
+SITE006,QTL02,Early Discontinuation Rate,Retention,16.67,15.0,25.0,Yellow,4,24,QTL,2026-03-25
+SITE006,QTL03,Missing Primary Endpoint Rate,Data Quality,0.0,5.0,10.0,Green,0,24,QTL,2026-03-25
+SITE007,QTL01,Protocol Deviation Rate,Compliance,3.57,5.0,10.0,Green,1,28,QTL,2026-03-25
+SITE007,QTL02,Early Discontinuation Rate,Retention,0.0,15.0,25.0,Green,0,28,QTL,2026-03-25
+SITE007,QTL03,Missing Primary Endpoint Rate,Data Quality,0.0,5.0,10.0,Green,0,28,QTL,2026-03-25
+SITE008,QTL01,Protocol Deviation Rate,Compliance,0.0,5.0,10.0,Green,0,21,QTL,2026-03-25
+SITE008,QTL02,Early Discontinuation Rate,Retention,0.0,15.0,25.0,Green,0,21,QTL,2026-03-25
+SITE008,QTL03,Missing Primary Endpoint Rate,Data Quality,0.0,5.0,10.0,Green,0,21,QTL,2026-03-25
+SITE001,KRI01,Adverse Event Rate,Safety,28.0,40.0,60.0,Green,7,25,KRI,2026-03-25
+SITE001,KRI02,Serious Adverse Event Rate,Safety,4.0,10.0,20.0,Green,1,25,KRI,2026-03-25
+SITE001,KRI03,Enrollment Rate Achievement,Enrollment,89.29,80.0,60.0,Green,25,28,KRI,2026-03-25
+SITE001,KRI04,Query Resolution Rate,Data Quality,83.63,85.0,70.0,Yellow,143,171,KRI,2026-03-25
+SITE002,KRI01,Adverse Event Rate,Safety,27.27,40.0,60.0,Green,6,22,KRI,2026-03-25
+SITE002,KRI02,Serious Adverse Event Rate,Safety,4.55,10.0,20.0,Green,1,22,KRI,2026-03-25
+SITE002,KRI03,Enrollment Rate Achievement,Enrollment,88.0,80.0,60.0,Green,22,25,KRI,2026-03-25
+SITE002,KRI04,Query Resolution Rate,Data Quality,92.5,85.0,70.0,Green,148,160,KRI,2026-03-25
+SITE003,KRI01,Adverse Event Rate,Safety,66.67,40.0,60.0,Red,18,27,KRI,2026-03-25
+SITE003,KRI02,Serious Adverse Event Rate,Safety,7.41,10.0,20.0,Green,2,27,KRI,2026-03-25
+SITE003,KRI03,Enrollment Rate Achievement,Enrollment,90.0,80.0,60.0,Green,27,30,KRI,2026-03-25
+SITE003,KRI04,Query Resolution Rate,Data Quality,58.06,85.0,70.0,Red,54,93,KRI,2026-03-25
+SITE004,KRI01,Adverse Event Rate,Safety,25.0,40.0,60.0,Green,5,20,KRI,2026-03-25
+SITE004,KRI02,Serious Adverse Event Rate,Safety,5.0,10.0,20.0,Green,1,20,KRI,2026-03-25
+SITE004,KRI03,Enrollment Rate Achievement,Enrollment,90.91,80.0,60.0,Green,20,22,KRI,2026-03-25
+SITE004,KRI04,Query Resolution Rate,Data Quality,90.44,85.0,70.0,Green,123,136,KRI,2026-03-25
+SITE005,KRI01,Adverse Event Rate,Safety,23.33,40.0,60.0,Green,7,30,KRI,2026-03-25
+SITE005,KRI02,Serious Adverse Event Rate,Safety,0.0,10.0,20.0,Green,0,30,KRI,2026-03-25
+SITE005,KRI03,Enrollment Rate Achievement,Enrollment,93.75,80.0,60.0,Green,30,32,KRI,2026-03-25
+SITE005,KRI04,Query Resolution Rate,Data Quality,86.24,85.0,70.0,Green,94,109,KRI,2026-03-25
+SITE006,KRI01,Adverse Event Rate,Safety,41.67,40.0,60.0,Yellow,10,24,KRI,2026-03-25
+SITE006,KRI02,Serious Adverse Event Rate,Safety,4.17,10.0,20.0,Green,1,24,KRI,2026-03-25
+SITE006,KRI03,Enrollment Rate Achievement,Enrollment,92.31,80.0,60.0,Green,24,26,KRI,2026-03-25
+SITE006,KRI04,Query Resolution Rate,Data Quality,81.03,85.0,70.0,Yellow,94,116,KRI,2026-03-25
+SITE007,KRI01,Adverse Event Rate,Safety,28.57,40.0,60.0,Green,8,28,KRI,2026-03-25
+SITE007,KRI02,Serious Adverse Event Rate,Safety,0.0,10.0,20.0,Green,0,28,KRI,2026-03-25
+SITE007,KRI03,Enrollment Rate Achievement,Enrollment,93.33,80.0,60.0,Green,28,30,KRI,2026-03-25
+SITE007,KRI04,Query Resolution Rate,Data Quality,94.25,85.0,70.0,Green,164,174,KRI,2026-03-25
+SITE008,KRI01,Adverse Event Rate,Safety,14.29,40.0,60.0,Green,3,21,KRI,2026-03-25
+SITE008,KRI02,Serious Adverse Event Rate,Safety,0.0,10.0,20.0,Green,0,21,KRI,2026-03-25
+SITE008,KRI03,Enrollment Rate Achievement,Enrollment,87.5,80.0,60.0,Green,21,24,KRI,2026-03-25
+SITE008,KRI04,Query Resolution Rate,Data Quality,83.49,85.0,70.0,Yellow,91,109,KRI,2026-03-25

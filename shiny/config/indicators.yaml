@@ -1,0 +1,80 @@
+qtl:
+  - id: QTL01
+    name: Protocol Deviation Rate
+    category: Compliance
+    description: Percentage of subjects with at least one protocol deviation
+    justification: High deviation rate indicates site non-compliance and data quality risk
+    formula: "n_subjects_with_dv / n_enrolled * 100"
+    unit: "%"
+    threshold_yellow: 5
+    threshold_red: 10
+    domain: DV
+
+  - id: QTL02
+    name: Early Discontinuation Rate
+    category: Retention
+    description: Percentage of subjects who discontinued before study completion
+    justification: High dropout rate may introduce bias and compromise study integrity
+    formula: "n_discontinued / n_enrolled * 100"
+    unit: "%"
+    threshold_yellow: 15
+    threshold_red: 25
+    domain: DS
+
+  - id: QTL03
+    name: Missing Primary Endpoint Rate
+    category: Data Quality
+    description: Percentage of subjects with missing primary endpoint data
+    justification: Missing data may affect statistical analysis validity
+    formula: "n_missing_endpoint / n_enrolled * 100"
+    unit: "%"
+    threshold_yellow: 5
+    threshold_red: 10
+    domain: DM
+
+kri:
+  - id: KRI01
+    name: Adverse Event Rate
+    category: Safety
+    description: Percentage of subjects experiencing at least one adverse event
+    justification: Elevated AE rate may signal safety concerns requiring immediate review
+    formula: "n_subjects_with_ae / n_enrolled * 100"
+    unit: "%"
+    threshold_yellow: 40
+    threshold_red: 60
+    domain: AE
+
+  - id: KRI02
+    name: Serious Adverse Event Rate
+    category: Safety
+    description: Percentage of subjects experiencing at least one serious adverse event
+    justification: SAEs require expedited reporting and may indicate patient safety risk
+    formula: "n_subjects_with_sae / n_enrolled * 100"
+    unit: "%"
+    threshold_yellow: 10
+    threshold_red: 20
+    domain: AE
+
+  - id: KRI03
+    name: Enrollment Rate Achievement
+    category: Enrollment
+    description: Percentage of planned enrollment achieved at each site
+    justification: Under-enrollment may delay study completion and compromise statistical power
+    formula: "n_enrolled / n_planned * 100"
+    unit: "%"
+    threshold_yellow: 80
+    threshold_red: 60
+    direction: lower_is_worse
+    domain: DM
+
+  - id: KRI04
+    name: Query Resolution Rate
+    category: Data Quality
+    description: Percentage of open queries resolved within 30 days
+    justification: Unresolved queries indicate data management issues and delay database lock
+    formula: "n_resolved_queries / n_total_queries * 100"
+    unit: "%"
+    threshold_yellow: 85
+    threshold_red: 70
+    direction: lower_is_worse
+    domain: DM
