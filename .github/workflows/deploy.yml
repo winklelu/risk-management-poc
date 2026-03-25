@@ -32,20 +32,20 @@ jobs:
 
       - name: Generate SDTM data & risk_summary.csv
         run: |
-          cd Risk_Management/python
+          cd python
           python pipeline.py
 
       - name: Sync generated data into shiny bundle
         run: |
-          cp Risk_Management/data/risk_summary.csv Risk_Management/shiny/data/
-          cp Risk_Management/config/indicators.yaml Risk_Management/shiny/config/
+          cp data/risk_summary.csv shiny/data/
+          cp config/indicators.yaml shiny/config/
 
       - name: Install Shinylive
         run: pip install shinylive shiny plotly pyyaml pandas numpy
 
       - name: Export Shinylive static site
         run: |
-          shinylive export Risk_Management/shiny site
+          shinylive export shiny site
 
       - name: Add .nojekyll (required for GitHub Pages)
         run: touch site/.nojekyll
